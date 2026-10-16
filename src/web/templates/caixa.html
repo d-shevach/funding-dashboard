@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash & Dividends</title>
+    <style>
+        :root { --primary: #27AE60; --bg: #f4f6f5; --card: #ffffff; --text: #1f2d24; --muted: #8a9a8f; }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) { --bg: #111815; --card: #1c2620; --text: #e6efe9; --muted: #7d8f84; }
+        }
+        :root[data-theme="dark"] { --bg: #111815; --card: #1c2620; --text: #e6efe9; --muted: #7d8f84; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
+        .wrap { max-width: 960px; margin: 0 auto; padding: 16px; }
+        header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+        h1 { font-size: 1.4em; color: var(--primary); margin: 0; }
+        a.voltar { color: var(--primary); font-weight: 600; text-decoration: none; border: 2px solid var(--primary); padding: 8px 14px; border-radius: 6px; }
+        .card { background: var(--card); border-radius: 10px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow-x: auto; }
+        .card h2 { font-size: 1.05em; margin: 0 0 12px; color: var(--primary); }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+        th, td { padding: 8px; border-bottom: 1px solid rgba(128,128,128,0.2); }
+        th { text-align: left; color: var(--muted); font-size: 12px; text-transform: uppercase; }
+        td.num, th.num { text-align: right; }
+        .big { font-size: 22px; font-weight: bold; margin-top: 4px; }
+        .muted { color: var(--muted); font-size: 13px; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <h1>Cash & Dividends</h1>
+        <a class="voltar" href="/">← Back to dashboard</a>
+    </header>
+
+    <div class="card">
+        <h2>Cash by bank</h2>
+        <div class="muted">Total cash</div>
+        <div class="big" id="caixa-total">-</div>
+        <table style="margin-top:12px">
+            <thead><tr><th>Bank</th><th class="num">Balance (USD)</th></tr></thead>
+            <tbody id="caixa-tabela"></tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Dividends and coupons by month</h2>
+        <table>
+            <thead>
+                <tr><th>Month</th><th>Asset</th><th>Bank</th><th class="num">Gross</th><th class="num">Tax</th><th class="num">Net</th></tr>
+            </thead>
+            <tbody id="dividendos-tabela"></tbody>
+            <tfoot id="dividendos-total"></tfoot>
+        </table>
+        <div class="muted" style="margin-top:8px">Only BTG Pactual pays dividends and coupons in this setup. The BofA strategy does not distribute income.</div>
+    </div>
+</div>
+
+<script>
+const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+const fmt = v => v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+async function carregar() {
+    const json = await (await fetch('/api/caixa_dividendos')).json();
+    if (!json.success) return;
+    const d = json.data;
+
+    document.getElementById('caixa-total').textContent = 'US$ ' + fmt(d.caixa_total);
+    document.getElementById('caixa-tabela').innerHTML = d.caixa.map(c =>
+        `<tr><td>${c.banco}</td><td class="num">US$ ${fmt(c.valor)}</td></tr>`).join('') || '<tr><td colspan="2">No cash registered</td></tr>';
+
+    document.getElementById('dividendos-tabela').innerHTML = d.dividendos.map(x =>
+        `<tr><td>${MESES[x.mes - 1]}/${x.ano}</td><td>${x.ticker} <span class="muted">${x.nome}</span></td><td>${x.banco}</td>
+         <td class="num">US$ ${fmt(x.bruto)}</td><td class="num">US$ ${fmt(x.imposto)}</td><td class="num">US$ ${fmt(x.liquido)}</td></tr>`).join('')
+        || '<tr><td colspan="6">No dividends registered</td></tr>';
+
+    const bruto = d.dividendos.reduce((s, x) => s + x.bruto, 0);
+    const imposto = d.dividendos.reduce((s, x) => s + x.imposto, 0);
+    const liquido = d.dividendos.reduce((s, x) => s + x.liquido, 0);
+    document.getElementById('dividendos-total').innerHTML =
+        `<tr><th colspan="3">Total</th><th class="num">US$ ${fmt(bruto)}</th><th class="num">US$ ${fmt(imposto)}</th><th class="num">US$ ${fmt(liquido)}</th></tr>`;
+}
+
+carregar();
+</script>
+</body>
+</html>

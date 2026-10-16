@@ -1,0 +1,12 @@
+mysql-connector-python>=9.0
+python-dotenv>=1.0
+yfinance>=0.2.50
+requests>=2.31
+APScheduler>=3.10,<4
+pandas>=2.3
+pdfplumber>=0.11
+flask>=3.0
+gunicorn>=21.2
+matplotlib>=3.8
+anthropic>=0.40
+holidays>=0.50
