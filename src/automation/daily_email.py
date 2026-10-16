@@ -177,7 +177,7 @@ def _chart_block(cid: str) -> str:
 
 
 def build_report_html(positions, today: date, market=None, chart_cid=None, boletim_html=None) -> str:
-    boletim_block = _section("Daily bulletin", boletim_html) if boletim_html else ""
+    boletim_block = _section("Bass - Daily bulletin", boletim_html) if boletim_html else ""
     market_html = _market_block(market) if market else ""
     chart_html = _chart_block(chart_cid) if chart_cid else ""
     by_moeda = _group(positions, lambda p: p["moeda"] or "-")
