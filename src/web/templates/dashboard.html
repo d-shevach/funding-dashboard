@@ -153,7 +153,8 @@
         }
 
         .type-section {
-            background: #fafafa;
+            background: white;
+            border: 2px solid #f0f0f0;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 25px;
@@ -364,7 +365,7 @@
         @media (prefers-color-scheme: dark) {
             body { background: #111815; color: #e6efe9; }
             .header { color: #e6efe9; }
-            table, .card, .performance-section, .perf-card, [style*="background:white"], [style*="background: white"] {
+            table, .card, .performance-section, .perf-card, .type-section, [style*="background:white"], [style*="background: white"] {
                 background: #1c2620 !important;
                 color: #e6efe9;
             }
@@ -374,6 +375,7 @@
             tr:hover { background: #22302a; }
             tr.subtotal-row { background: #24332b; }
             .type-stats, .type-header { background: #22302a; }
+            .type-section { border-color: #22302a !important; }
             .filter-btn { background: #22302a; color: #e6efe9; }
             .filter-btn.active { background: #27AE60; color: white; }
             select { background: #1c2620 !important; color: #27AE60 !important; }
